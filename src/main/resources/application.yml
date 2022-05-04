@@ -1,0 +1,30 @@
+axon:
+  serializer:
+    events: jackson
+    general: jackson
+    messages: jackson
+  amqp:
+    exchange: events
+  eventhandling:
+    processors:
+      name:
+        source: eventsQueueMessageSource
+server:
+  error:
+    include-binding-errors: always
+    include-message: always  port: 8081
+spring:
+  application:
+    name: auction-query-service
+  data:
+    mongodb:      uri: mongodb://root:admin123@localhost:27017/auctiondb?authSource=admin
+      
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eauction:
+  rabbitmq:
+    queue: events

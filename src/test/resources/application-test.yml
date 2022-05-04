@@ -1,0 +1,32 @@
+axon:
+  serializer:
+    events: jackson
+    general: jackson
+    messages: jackson
+  amqp:
+    exchange: events
+  eventhandling:
+    processors:
+      name:
+        source: eventsQueueMessageSource
+server:
+  error:
+    include-binding-errors: always
+    include-message: always  port: 8081
+spring:
+  application:
+    name: auction-query-service
+  mongodb:
+    embedded:
+      version: 3.4.5
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration    
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eauction:
+  rabbitmq:
+    queue: events
