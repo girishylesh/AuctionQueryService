@@ -12,7 +12,7 @@ import com.eauction.query.dto.GetProductQuery;
 import com.eauction.query.dto.ProductBids;
 
 @RestController
-@RequestMapping(value = "/e-auction/api/v1")
+@RequestMapping(value = "/e-auction/api/v1/query")
 public class AuctionQueryController {
 	
 	@Autowired
