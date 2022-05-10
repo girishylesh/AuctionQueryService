@@ -8,7 +8,7 @@
 		<version>2.6.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.fse</groupId>
+	<groupId>com.eauction</groupId>
 	<artifactId>auction-query-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>AuctionQueryService</name>
@@ -24,6 +24,7 @@
 	    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 	    <sonar.language>java</sonar.language>
 	    <spring-cloud.version>2021.0.2</spring-cloud.version>
+	    <logstash-logback.version>7.1.1</logstash-logback.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -85,6 +86,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+		<dependency>
+		    <groupId>net.logstash.logback</groupId>
+		    <artifactId>logstash-logback-encoder</artifactId>
+		    <version>${logstash-logback.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
