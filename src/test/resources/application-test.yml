@@ -30,3 +30,8 @@ spring:
 eauction:
   rabbitmq:
     queue: events
+
+eureka:
+   client:
+      registerWithEureka: false
+      fetchRegistry: false

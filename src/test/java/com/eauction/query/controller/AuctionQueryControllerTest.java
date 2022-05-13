@@ -96,7 +96,7 @@ class AuctionQueryControllerTest {
 	
 	@Test
 	void getBidTest() throws Exception {
-		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/seller/show-bids/uid102")
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/seller/show-bids/uid102")
 				.contentType("application/json"))
 	            .andExpect(status().isOk())
 	            .andReturn();
@@ -107,7 +107,7 @@ class AuctionQueryControllerTest {
 	
 	@Test
 	void getBidTestNoBids() throws Exception {
-		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/seller/show-bids/uid1xx")
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/seller/show-bids/uid1xx")
 				.contentType("application/json"))
 	            .andExpect(status().isOk())
 	            .andReturn();
