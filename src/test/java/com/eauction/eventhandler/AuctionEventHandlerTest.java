@@ -28,7 +28,7 @@ import com.eauction.query.repository.ProductRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class QueryEventHandlerTest {
+class AuctionEventHandlerTest {
 
 	@Mock
 	private AuctionUserRepository auctionUserRepository;
@@ -40,13 +40,13 @@ class QueryEventHandlerTest {
 	private BidRepository bidRepository;
 
 	@InjectMocks
-	private QueryEventHandler queryEventHandler;
+	private AuctionEventHandler auctionEventHandler;
 
 	@Test
 	void auctionUserCreatedEventTest() {
 		AuctionUserCreatedEvent auctionUserCreatedEvent = new AuctionUserCreatedEvent();
 		when(auctionUserRepository.save(any(AuctionUser.class))).thenAnswer(i -> i.getArguments()[0]);
-		queryEventHandler.auctionUserCreatedEvent(auctionUserCreatedEvent);
+		auctionEventHandler.auctionUserCreatedEvent(auctionUserCreatedEvent);
 		verify(auctionUserRepository).save(any(AuctionUser.class));
 	}
 
@@ -54,7 +54,7 @@ class QueryEventHandlerTest {
 	void productCreatedEventTest() {
 		ProductCreatedEvent productCreatedEvent = new ProductCreatedEvent();
 		when(productRepository.save(any(Product.class))).thenAnswer(i -> i.getArguments()[0]);
-		queryEventHandler.productCreatedEvent(productCreatedEvent);
+		auctionEventHandler.productCreatedEvent(productCreatedEvent);
 		verify(productRepository).save(any(Product.class));
 	}
 
@@ -63,7 +63,7 @@ class QueryEventHandlerTest {
 		ProductDeletedEvent productDeletedEvent = new ProductDeletedEvent();
 		productDeletedEvent.setUid("u123");
 		doNothing().when(productRepository).deleteById(anyString());
-		queryEventHandler.productDeletedEvent(productDeletedEvent);
+		auctionEventHandler.productDeletedEvent(productDeletedEvent);
 		verify(productRepository).deleteById(anyString());
 	}
 	
@@ -71,7 +71,7 @@ class QueryEventHandlerTest {
 	void bidCreatedEventTest() {
 		BidCreatedEvent bidCreatedEvent = new BidCreatedEvent();
 		when(bidRepository.save(any(Bid.class))).thenAnswer(i -> i.getArguments()[0]);
-		queryEventHandler.bidCreatedEvent(bidCreatedEvent);
+		auctionEventHandler.bidCreatedEvent(bidCreatedEvent);
 		verify(bidRepository).save(any(Bid.class));
 	}
 	
@@ -81,7 +81,7 @@ class QueryEventHandlerTest {
 		bidUpdatedEvent.setUid("u111");
 		when(bidRepository.findById(anyString())).thenReturn(Optional.of(new Bid()));
 		when(bidRepository.save(any(Bid.class))).thenAnswer(i -> i.getArguments()[0]);
-		queryEventHandler.bidUpdatedEvent(bidUpdatedEvent);
+		auctionEventHandler.bidUpdatedEvent(bidUpdatedEvent);
 		verify(bidRepository).save(any(Bid.class));	
 	}
 }

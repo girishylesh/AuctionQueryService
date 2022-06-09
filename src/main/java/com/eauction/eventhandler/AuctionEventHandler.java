@@ -1,14 +1,9 @@
 package com.eauction.eventhandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
-import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,9 +16,6 @@ import com.eauction.events.BidCreatedEvent;
 import com.eauction.events.BidUpdatedEvent;
 import com.eauction.events.ProductCreatedEvent;
 import com.eauction.events.ProductDeletedEvent;
-import com.eauction.query.dto.GetProductQuery;
-import com.eauction.query.dto.PlacedBid;
-import com.eauction.query.dto.ProductBids;
 import com.eauction.query.repository.AuctionUserRepository;
 import com.eauction.query.repository.BidRepository;
 import com.eauction.query.repository.ProductRepository;
@@ -33,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @ProcessingGroup("auctionEventProcessor")
-public class QueryEventHandler {
+public class AuctionEventHandler {
 	
 	@Autowired
 	private AuctionUserRepository auctionUserRepository;
@@ -87,28 +79,5 @@ public class QueryEventHandler {
 		} else {
 			log.error("Bid not found: {}", bidUpdatedEvent.getUid());
 		}
-	}
-	
-	@QueryHandler
-	public ProductBids getBids(GetProductQuery getProductQuery) {
-		List<Bid> bids = bidRepository.findByProductUid(getProductQuery.getProductId()).orElse(Collections.emptyList());
-		if(!bids.isEmpty()) {
-			Product product = bids.stream().findFirst().map(bid -> bid.getProduct()).get();
-			List<PlacedBid> placedBids = new ArrayList<>();
-			bids.stream().sorted(Comparator.comparingDouble(Bid::getBidAmount).reversed())
-			.forEach(bid -> {
-				PlacedBid placedBid = PlacedBid.builder()
-						.uid(bid.getUid())
-						.bidAmount(bid.getBidAmount())
-						.buyerEmail(bid.getAuctionUser().getEmail())
-						.buyerFirstName(bid.getAuctionUser().getFirstName())
-						.buyerLastName(bid.getAuctionUser().getLastName())
-						.build();
-				placedBids.add(placedBid);	
-			});
-			return ProductBids.builder().bids(placedBids).product(product).build();
-		}
-		
-		return ProductBids.builder().build();
 	}
 }
