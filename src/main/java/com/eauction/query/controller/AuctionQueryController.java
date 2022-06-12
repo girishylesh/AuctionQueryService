@@ -1,5 +1,7 @@
 package com.eauction.query.controller;
 
+import java.util.List;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eauction.entity.AuctionUser;
+import com.eauction.entity.Product;
 import com.eauction.query.dto.GetAuctionUserQuery;
+import com.eauction.query.dto.GetProductBidsQuery;
 import com.eauction.query.dto.GetProductQuery;
 import com.eauction.query.dto.ProductBids;
 import com.eauction.query.exception.UserNotFoundException;
@@ -25,11 +29,6 @@ public class AuctionQueryController {
 	@Autowired
     private QueryGateway queryGateway;
 	
-	@GetMapping("/seller/show-bids/{productId}")
-	public ProductBids getBids(@PathVariable String productId) throws Exception {	
-		return queryGateway.query(new GetProductQuery(productId), ResponseTypes.instanceOf(ProductBids.class)).get();
-	}
-	
 	@GetMapping("/user/{email}")
 	public ResponseEntity<?> getAuctionUser(@PathVariable String email) throws Exception {	
 		AuctionUser user = queryGateway.query(new GetAuctionUserQuery(email), ResponseTypes.instanceOf(AuctionUser.class)).get();
@@ -38,4 +37,16 @@ public class AuctionQueryController {
 		}
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
+	
+
+	@GetMapping("/seller/products/{userUid}")
+	public List<Product> getProducts(@PathVariable String userUid) throws Exception {	
+		return queryGateway.query(GetProductQuery.builder().userUid(userUid).build(), ResponseTypes.multipleInstancesOf(Product.class)).get();
+	}
+	
+	@GetMapping("/seller/show-bids/{productId}")
+	public ProductBids getBids(@PathVariable String productId) throws Exception {	
+		return queryGateway.query(new GetProductBidsQuery(productId), ResponseTypes.instanceOf(ProductBids.class)).get();
+	}
+
 }

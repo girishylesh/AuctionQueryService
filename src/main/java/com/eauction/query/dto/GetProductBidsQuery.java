@@ -1,7 +1,6 @@
 package com.eauction.query.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,8 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Builder
-public class GetProductQuery {
+public class GetProductBidsQuery {
 	private String productId;
-	private String userUid;
 }

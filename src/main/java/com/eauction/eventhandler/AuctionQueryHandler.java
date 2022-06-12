@@ -13,11 +13,13 @@ import com.eauction.entity.AuctionUser;
 import com.eauction.entity.Bid;
 import com.eauction.entity.Product;
 import com.eauction.query.dto.GetAuctionUserQuery;
+import com.eauction.query.dto.GetProductBidsQuery;
 import com.eauction.query.dto.GetProductQuery;
 import com.eauction.query.dto.PlacedBid;
 import com.eauction.query.dto.ProductBids;
 import com.eauction.query.repository.AuctionUserRepository;
 import com.eauction.query.repository.BidRepository;
+import com.eauction.query.repository.ProductRepository;
 
 @Component
 public class AuctionQueryHandler {
@@ -28,9 +30,12 @@ public class AuctionQueryHandler {
 	@Autowired
 	private BidRepository bidRepository;
 	
+	@Autowired
+	private ProductRepository productRepository;
+	
 	@QueryHandler
-	public ProductBids getBids(GetProductQuery getProductQuery) {
-		List<Bid> bids = bidRepository.findByProductUid(getProductQuery.getProductId()).orElse(Collections.emptyList());
+	public ProductBids getBids(GetProductBidsQuery getProductBidsQuery) {
+		List<Bid> bids = bidRepository.findByProductUid(getProductBidsQuery.getProductId()).orElse(Collections.emptyList());
 		if(!bids.isEmpty()) {
 			Product product = bids.stream().findFirst().map(bid -> bid.getProduct()).get();
 			List<PlacedBid> placedBids = new ArrayList<>();
@@ -54,5 +59,10 @@ public class AuctionQueryHandler {
 	@QueryHandler
 	public AuctionUser getAuctionUser(GetAuctionUserQuery getAuctionUserQuery) {
 		return auctionUserRepository.findByEmail(getAuctionUserQuery.getEmail()).orElseGet(AuctionUser::new);
+	}
+	
+	@QueryHandler
+	public List<Product> getAuctionUser(GetProductQuery getProductQuery) {
+		return productRepository.findByAuctionUserUid(getProductQuery.getUserUid()).orElse(Collections.emptyList());
 	}
 }
