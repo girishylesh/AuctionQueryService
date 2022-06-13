@@ -39,14 +39,14 @@ public class AuctionQueryController {
 	}
 	
 
-	@GetMapping("/seller/products/{userUid}")
+	@GetMapping("/products/{userUid}")
 	public List<Product> getProducts(@PathVariable String userUid) throws Exception {	
 		return queryGateway.query(GetProductQuery.builder().userUid(userUid).build(), ResponseTypes.multipleInstancesOf(Product.class)).get();
 	}
 	
-	@GetMapping("/seller/show-bids/{productId}")
-	public ProductBids getBids(@PathVariable String productId) throws Exception {	
-		return queryGateway.query(new GetProductBidsQuery(productId), ResponseTypes.instanceOf(ProductBids.class)).get();
+	@GetMapping("/show-bids/{userUid}")
+	public ProductBids getBids(@PathVariable String userUid) throws Exception {	
+		return queryGateway.query(new GetProductBidsQuery(userUid), ResponseTypes.instanceOf(ProductBids.class)).get();
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.eauction.eventhandler;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.eauction.entity.AuctionUser;
 import com.eauction.entity.Bid;
 import com.eauction.entity.Product;
+import com.eauction.enums.UserType;
 import com.eauction.query.dto.GetAuctionUserQuery;
 import com.eauction.query.dto.GetProductBidsQuery;
 import com.eauction.query.dto.GetProductQuery;
@@ -35,7 +37,13 @@ public class AuctionQueryHandler {
 	
 	@QueryHandler
 	public ProductBids getBids(GetProductBidsQuery getProductBidsQuery) {
-		List<Bid> bids = bidRepository.findByProductUid(getProductBidsQuery.getProductId()).orElse(Collections.emptyList());
+		List<Bid> bids = new ArrayList<>();
+		AuctionUser user = auctionUserRepository.findById(getProductBidsQuery.getUserUid()).orElseGet(AuctionUser::new);
+		if(UserType.SELLER.equals(user.getUserType())) {
+			bids = bidRepository.findByProductAuctionUserUid(getProductBidsQuery.getUserUid()).orElse(Collections.emptyList());
+		} else if(UserType.BUYER.equals(user.getUserType())) {
+			bids = bidRepository.findByAuctionUserUid(getProductBidsQuery.getUserUid()).orElse(Collections.emptyList());
+		}
 		if(!bids.isEmpty()) {
 			Product product = bids.stream().findFirst().map(bid -> bid.getProduct()).get();
 			List<PlacedBid> placedBids = new ArrayList<>();
@@ -62,7 +70,13 @@ public class AuctionQueryHandler {
 	}
 	
 	@QueryHandler
-	public List<Product> getAuctionUser(GetProductQuery getProductQuery) {
-		return productRepository.findByAuctionUserUid(getProductQuery.getUserUid()).orElse(Collections.emptyList());
+	public List<Product> getProducts(GetProductQuery getProductQuery) {
+		AuctionUser user = auctionUserRepository.findById(getProductQuery.getUserUid()).orElseGet(AuctionUser::new);
+		if(UserType.SELLER.equals(user.getUserType())) {
+			return productRepository.findByAuctionUserUidAndBidEndDateGreaterThanEqual(getProductQuery.getUserUid(), LocalDate.now()).orElse(Collections.emptyList());
+		} else if(UserType.BUYER.equals(user.getUserType())) {
+			return productRepository.findByBidEndDateGreaterThanEqual(LocalDate.now()).orElse(Collections.emptyList());
+		}
+		return Collections.emptyList();
 	}
 }

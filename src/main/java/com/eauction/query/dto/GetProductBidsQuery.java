@@ -10,5 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class GetProductBidsQuery {
-	private String productId;
+	private String userUid;
 }
