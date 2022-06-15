@@ -1,5 +1,7 @@
 package com.eauction.query.dto;
 
+import com.eauction.entity.Product;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,4 +13,5 @@ public class PlacedBid {
 	private String buyerFirstName;
 	private String buyerLastName;
 	private String buyerEmail;
+	private Product product;
 }

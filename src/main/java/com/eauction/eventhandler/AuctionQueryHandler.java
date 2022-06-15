@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import com.eauction.query.dto.GetAuctionUserQuery;
 import com.eauction.query.dto.GetProductBidsQuery;
 import com.eauction.query.dto.GetProductQuery;
 import com.eauction.query.dto.PlacedBid;
-import com.eauction.query.dto.ProductBids;
 import com.eauction.query.repository.AuctionUserRepository;
 import com.eauction.query.repository.BidRepository;
 import com.eauction.query.repository.ProductRepository;
@@ -36,16 +36,18 @@ public class AuctionQueryHandler {
 	private ProductRepository productRepository;
 	
 	@QueryHandler
-	public ProductBids getBids(GetProductBidsQuery getProductBidsQuery) {
+	public List<PlacedBid> getBids(GetProductBidsQuery getProductBidsQuery) {
 		List<Bid> bids = new ArrayList<>();
 		AuctionUser user = auctionUserRepository.findById(getProductBidsQuery.getUserUid()).orElseGet(AuctionUser::new);
 		if(UserType.SELLER.equals(user.getUserType())) {
-			bids = bidRepository.findByProductAuctionUserUid(getProductBidsQuery.getUserUid()).orElse(Collections.emptyList());
+			List<Product> products = productRepository.findByAuctionUserUidAndBidEndDateGreaterThanEqual(user.getUid(), LocalDate.now())
+					.orElse(Collections.emptyList());
+			List<String> productUids = products.stream().map(prd-> prd.getUid()).collect(Collectors.toList());
+			bids = bidRepository.findByProductIn(productUids).orElse(Collections.emptyList());
 		} else if(UserType.BUYER.equals(user.getUserType())) {
-			bids = bidRepository.findByAuctionUserUid(getProductBidsQuery.getUserUid()).orElse(Collections.emptyList());
+			bids = bidRepository.findByAuctionUserUid(user.getUid()).orElse(Collections.emptyList());
 		}
 		if(!bids.isEmpty()) {
-			Product product = bids.stream().findFirst().map(bid -> bid.getProduct()).get();
 			List<PlacedBid> placedBids = new ArrayList<>();
 			bids.stream().sorted(Comparator.comparingDouble(Bid::getBidAmount).reversed())
 			.forEach(bid -> {
@@ -55,13 +57,14 @@ public class AuctionQueryHandler {
 						.buyerEmail(bid.getAuctionUser().getEmail())
 						.buyerFirstName(bid.getAuctionUser().getFirstName())
 						.buyerLastName(bid.getAuctionUser().getLastName())
+						.product(bid.getProduct())
 						.build();
 				placedBids.add(placedBid);	
 			});
-			return ProductBids.builder().bids(placedBids).product(product).build();
+			return placedBids;
 		}
 		
-		return ProductBids.builder().build();
+		return Collections.emptyList();
 	}
 	
 	@QueryHandler

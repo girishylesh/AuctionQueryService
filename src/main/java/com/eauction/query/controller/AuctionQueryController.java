@@ -19,7 +19,7 @@ import com.eauction.entity.Product;
 import com.eauction.query.dto.GetAuctionUserQuery;
 import com.eauction.query.dto.GetProductBidsQuery;
 import com.eauction.query.dto.GetProductQuery;
-import com.eauction.query.dto.ProductBids;
+import com.eauction.query.dto.PlacedBid;
 import com.eauction.query.exception.UserNotFoundException;
 
 @RestController
@@ -45,8 +45,8 @@ public class AuctionQueryController {
 	}
 	
 	@GetMapping("/show-bids/{userUid}")
-	public ProductBids getBids(@PathVariable String userUid) throws Exception {	
-		return queryGateway.query(new GetProductBidsQuery(userUid), ResponseTypes.instanceOf(ProductBids.class)).get();
+	public List<PlacedBid> getBids(@PathVariable String userUid) throws Exception {	
+		return queryGateway.query(new GetProductBidsQuery(userUid), ResponseTypes.multipleInstancesOf(PlacedBid.class)).get();
 	}
 
 }
