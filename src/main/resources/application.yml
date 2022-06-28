@@ -12,18 +12,17 @@ axon:
 server:
   error:
     include-binding-errors: always
-    include-message: always  port: 8081
+    include-message: always  port: ${SERVER_PORT:8081}
 spring:
   application:
     name: auction-query-service
   data:
-    mongodb:      uri: mongodb://root:admin123@localhost:27017/auctiondb?authSource=admin
-      
+    mongodb:      uri: ${MONGO_URI:mongodb://root:admin123@localhost:27017/authdb?authSource=admin}   
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
 
 eauction:
   rabbitmq:
