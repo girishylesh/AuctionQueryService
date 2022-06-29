@@ -1,9 +1,11 @@
 package com.eauction.query.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +22,13 @@ import com.eauction.entity.Bid;
 import com.eauction.entity.Product;
 import com.eauction.enums.Category;
 import com.eauction.enums.UserType;
-import com.eauction.query.dto.ProductBids;
+import com.eauction.query.dto.PlacedBid;
 import com.eauction.query.repository.AuctionUserRepository;
 import com.eauction.query.repository.BidRepository;
 import com.eauction.query.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 
 @ActiveProfiles("test")
@@ -84,6 +88,7 @@ class AuctionQueryControllerTest {
 		product.setDetailedDesc("detailed desc");
 		product.setStartingPrice(100.0);
 		product.setCategory(Category.SCULPTOR);
+		product.setBidEndDate(LocalDate.now().plusWeeks(1));
 		productRepository.save(product);
 		
 		Bid bid = new Bid();
@@ -96,24 +101,70 @@ class AuctionQueryControllerTest {
 	
 	@Test
 	void getBidTest() throws Exception {
-		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/seller/show-bids/uid102")
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/show-bids/uid101")
 				.contentType("application/json"))
 	            .andExpect(status().isOk())
 	            .andReturn();
-		ProductBids bids = objectMapper.readValue(result.getResponse().getContentAsString(), ProductBids.class);
-		assertEquals("product1", bids.getProduct().getName());
-		assertEquals(110.0, bids.getBids().get(0).getBidAmount());
+		CollectionType typeReference =
+			    TypeFactory.defaultInstance().constructCollectionType(List.class, PlacedBid.class);
+		List<PlacedBid> bids = objectMapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertEquals("product1", bids.get(0).getProduct().getName());
+		assertEquals(110.0, bids.get(0).getBidAmount());
 	}
 	
 	@Test
 	void getBidTestNoBids() throws Exception {
-		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/seller/show-bids/uid1xx")
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/show-bids/uid1xx")
 				.contentType("application/json"))
 	            .andExpect(status().isOk())
 	            .andReturn();
-		ProductBids bids = objectMapper.readValue(result.getResponse().getContentAsString(), ProductBids.class);
-		assertNull(bids.getProduct());
-		assertNull(bids.getBids());
+		CollectionType typeReference =
+			    TypeFactory.defaultInstance().constructCollectionType(List.class, PlacedBid.class);
+		List<PlacedBid> bids = objectMapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertEquals(0, bids.size());
+	}
+	
+	@Test
+	void getProductsTest() throws Exception {
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/products/uid100")
+				.contentType("application/json"))
+	            .andExpect(status().isOk())
+	            .andReturn();
+		CollectionType typeReference =
+			    TypeFactory.defaultInstance().constructCollectionType(List.class, Product.class);
+		List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertEquals("product1", products.get(0).getName());
+		assertEquals(100.0, products.get(0).getStartingPrice());
+	}
+	
+	@Test
+	void getProductsTestNoData() throws Exception {
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/products/uid1xx")
+				.contentType("application/json"))
+	            .andExpect(status().isOk())
+	            .andReturn();
+		CollectionType typeReference =
+			    TypeFactory.defaultInstance().constructCollectionType(List.class, Product.class);
+		List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertEquals(0, products.size());
+	}
+	
+	@Test
+	void getUserTest() throws Exception {
+		MvcResult result = mockMvc.perform(get("/e-auction/api/v1/query/user/seller@email.com")
+				.contentType("application/json"))
+	            .andExpect(status().isOk())
+	            .andReturn();
+		AuctionUser user = objectMapper.readValue(result.getResponse().getContentAsString(), AuctionUser.class);
+		assertEquals("sname1", user.getFirstName());
+	}
+	
+	@Test
+	void getUserNotFoundTest() throws Exception {
+		mockMvc.perform(get("/e-auction/api/v1/query/user/xyz@email.com")
+				.contentType("application/json"))
+	            .andExpect(status().isNotFound())
+	            .andReturn();
 	}
 	
 }
