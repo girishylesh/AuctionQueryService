@@ -19,7 +19,7 @@ spring:
     name: auction-query-service
   data:
     mongodb:
-      uri: ${MONGO_URI:mongodb://root:admin123@localhost:27017/authdb?authSource=admin}   
+      uri: ${MONGO_URI:mongodb://root:admin123@localhost:27017/auctiondb?authSource=admin}   
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
