@@ -9,6 +9,7 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import com.eauction.query.dto.PlacedBid;
 import com.eauction.query.exception.UserNotFoundException;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "/e-auction/api/v1/query")
 public class AuctionQueryController {
 	
